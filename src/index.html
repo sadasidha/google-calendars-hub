@@ -4,7 +4,26 @@
 <meta charset="UTF-8">
 <title>Mock Calendar</title>
 <style>
-body { font-family: Arial, sans-serif; }
+body { 
+  font-family: Arial, sans-serif; 
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
+}
+.left-panel {
+  width: 300px;
+  background-color: #f5f5f5;
+  border-right: 1px solid #ccc;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.right-panel {
+  flex: 1;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto;
+}
 .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
 .day { border: 1px solid #ccc; min-height: 100px; padding: 5px; position: relative; }
 .event { background-color: #4285F4; color: white; padding: 2px 4px; border-radius: 4px; margin: 2px 0; font-size: 12px; }
@@ -19,85 +38,377 @@ body { font-family: Arial, sans-serif; }
   color: white;
 }
 #calendar {
-  width: 100%;
   border-collapse: collapse;
 }
-#calendar th, #calendar td {
+.selected {
+  background-color: #d0eaff !important;
+}
+
+#calendar thead th {
+  background-color: rgb(0, 43, 152);
+  color: white;
+  height: 24px;
+  max-height: 29px;
+}
+
+#calendar tbody tr{
+  height: 100px;
+}
+
+#calendar thead th, #calendar tbody tr td {
   border: 1px solid #ccc;
   padding: 5px;
   text-align: center;
+  min-width: 200px;
+  max-width: 200px;
+  width: 200px;
+}
+
+#calendar tbody td {
+  position: relative;
+}
+
+
+#smallCalendar {
+  width: 100%;
+  border-collapse: collapse;
+}
+#smallCalendar thead th {
+  background-color: rgb(0, 43, 152);
+  color: white;
+}
+#smallCalendar thead th, #smallCalendar tbody td {
+  border: 1px solid #ccc;
+  padding: 3px;
+  text-align: center;
+  min-height: 30px;
+  max-height: 30px;
+  height: 30px;
+  min-width: 30px;
+  max-width: 30px;
+  width: 30px;
+  font-size: small;
+}
+
+#smallCalendar tbody tr td {
+  cursor: pointer;
+}
+.button-next {
+  border-radius: 4px;
+  text-align: center;
+  display: inline-block;
+  font-size: small;
+  cursor: pointer; 
+  border: none;
+  width: 15px;
+}
+.date-full{
+  font-weight: bold;
+  align-items: left;
+  width: 125px;
+}
+.today {
+  background-color: #00eaff;
+  color: blue;
+}
+.off-month {
+  background-color: #f0f0f0;
+  color: lightgray;
+}
+
+.in-month {
+  background-color: white;
+  color: black;
+}
+.date-cell {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  border-radius: 5px;
+  font-weight: bold;
+  border: 1px solid gold;
+  cursor: pointer;
 }
 </style>
 </head>
 <body>
-<h2>Weekly Calendar</h2>
-<table id="calendar">
-  <thead>
-    <tr>
-      <th>Sun</th>
-      <th>Mon</th>
-      <th>Tue</th>
-      <th>Wed</th>
-      <th>Thu</th>
-      <th>Fri</th>
-      <th>Sat</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-  </tbody>
-</table>
+  <input type="text" data-bind="dataParam">
+<div class="left-panel">
+  <h3>Calendar Menu</h3>
+  <div id="dateDisplay">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span class="date-full" id="currentDate" style="font-weight: bold; font-size: 16px;"></span>
+      <span class="button-next" id="prevYear" title="Previous Year">&lt;&lt;</span>
+      <span class="button-next" id="prevMonth" title="Previous Month">&lt;</span>
+      <span class="button-next" id="today" title="Today">🔲</span>
+      <span class="button-next" id="nextMonth" title="Next Month">&gt;</span>
+      <span class="button-next" id="nextYear" title="Next Year">&gt;&gt;</span>
+    </div>
+  </div>
+  <p>
+    <table id="smallCalendar">
+    <thead>
+      <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    </tbody>
+  </table>
+  </p>
+</div>
+
+<div class="right-panel">
+  <h2>Weekly Calendar</h2>
+  <table id="calendar">
+    <thead>
+      <tr>
+        <th>Sun ☀️</th>
+        <th>Mon 📘</th>
+        <th>Tue 🔥</th>
+        <th>Wed 🌿</th>
+        <th>Thu ⚡</th>
+        <th>Fri 🎉</th>
+        <th>Sat 🍺</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+      </tr>
+      <tr>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+      </tr>
+      <tr>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+      </tr>
+      <tr>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+      </tr>
+      <tr>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+      </tr>
+      <tr>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+        <td><div class="date-cell"></div></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <script>
-function renderCalendar(year, month) {
-    const table = document.getElementById("calendar");
-    table.innerHTML = "";
+let currentDate = new Date();
+const today = new Date();
+let selectedDate = null;
 
-    // Weekday headers
-    const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const thead = document.createElement("thead");
-    const headRow = document.createElement("tr");
-    weekdays.forEach(day => {
-        const th = document.createElement("th");
-        th.textContent = day;
-        headRow.appendChild(th);
-    });
-    thead.appendChild(headRow);
-    table.appendChild(thead);
-
-    // Days calculation
-    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun ... 6=Sat
+function renderCalendar(query, year, month) {
+    const table = document.querySelector(query);
+    const firstDay = new Date(year, month, 1).getDay();
     const numDays = new Date(year, month + 1, 0).getDate();
-    const startCol = (firstDay + 6) % 7; // Shift so Mon=0 ... Sun=6
+    const startCol = (firstDay + 6) % 7;
 
-    // Create 6x7 rows
-    const tbody = document.createElement("tbody");
+    const tbody = table.tBodies[0];
     let day = 1;
-
-    for (let r = 0; r < 6; r++) {
-        const tr = document.createElement("tr");
-        for (let c = 0; c < 7; c++) {
-            const td = document.createElement("td");
-            if (r === 0 && c < startCol) {
-                td.textContent = "";
-            } else if (day > numDays) {
-                td.textContent = "";
+    const pattern = createPatternByMonth(year, month);
+    for (let l = 0, r = 0; r < 6; r++) {
+        const tr = tbody.rows[r];
+        for (let c = 0; c < 7; c++,l++) {
+            const td = tr.cells[c];
+            td.classList.remove("today");
+            td.classList.remove("off-month");
+            td.classList.remove("in-month");
+            const dateCell = td.querySelector(".date-cell");
+            dateCell.classList.remove("today");
+            dateCell.textContent = pattern[l].day;
+            dateCell.setAttribute("date-date", pattern[l].fullDate);
+            if (pattern[l].month != month) {
+                td.classList.add("off-month");
             } else {
-                td.textContent = day;
                 day++;
+                td.classList.add("in-month");
+                if (pattern[l].isToday) {
+                    dateCell.classList.add("today");
+                }
             }
-            tr.appendChild(td);
         }
-        tbody.appendChild(tr);
     }
-    table.appendChild(tbody);
 }
-renderCalendar(2024, 5); // June 2024
+
+function renderMiniCalendar(query, year, month) {
+    const table = document.querySelector(query);
+    const firstDay = new Date(year, month, 1).getDay();
+    const numDays = new Date(year, month + 1, 0).getDate();
+    const startCol = (firstDay + 6) % 7;
+
+    const tbody = table.tBodies[0];
+    let day = 1;
+    const pattern = createPatternByMonth(year, month);
+    for (let l = 0, r = 0; r < 6; r++) {
+        const tr = tbody.rows[r];
+        for (let c = 0; c < 7; c++,l++) {
+            const td = tr.cells[c];
+            td.classList.remove("today");
+            td.classList.remove("off-month");
+            td.classList.remove("in-month");
+            td.textContent = pattern[l].day;
+            td.setAttribute("date-date", pattern[l].fullDate);
+            if (pattern[l].month != month) {
+                td.classList.add("off-month");
+            } else {
+                day++;
+                if (pattern[l].isToday) {
+                    td.classList.add("today");
+                } else {
+                    td.classList.add("in-month");
+                }
+            }
+        }
+    }
+}
+
+function addSubDate(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function getDayStart(m) {
+  const weekday_start = m.getDay();
+  const numberOfDays = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+  if(weekday_start != 0) {
+    return addSubDate(m, - (7 - weekday_start));
+  } else if(numberOfDays == 28) {
+    return addSubDate(m, - 7)
+  } else {
+    return addSubDate(m, 0); // will give us a new date object
+  }
+}
+
+function createPatternByMonth(year, month) {
+  const LIMIT = 42;
+  const arr = new Array(LIMIT);
+  const m = new Date(year, month, 1);
+  const days_in_month = new Date(year, month + 1, 0).getDate();
+  let day_start = getDayStart(m);
+  for (let i = 0; i < LIMIT; i++) {
+      arr[i] = {
+          day: new Date(day_start).getDate(),
+          month: new Date(day_start).getMonth(),
+          isToday: (today.toDateString() === day_start.toDateString()),
+          fullDate: day_start.toISOString().split('T')[0]
+
+      }
+      day_start = addSubDate(day_start, 1);
+  }
+  return arr;
+}
+
+function updateCalendar() {
+  renderCalendar("#calendar", currentDate.getFullYear(), currentDate.getMonth());
+  renderMiniCalendar("#smallCalendar", currentDate.getFullYear(), currentDate.getMonth());
+  document.querySelector("#currentDate").innerText = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+document.querySelector("#prevYear").addEventListener("click", () => {
+    currentDate.setFullYear(currentDate.getFullYear() - 1);
+    updateCalendar();
+});
+
+document.querySelector("#prevMonth").addEventListener("click", () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    updateCalendar();
+});
+
+document.querySelector("#nextMonth").addEventListener("click", () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    updateCalendar();
+});
+
+document.querySelector("#nextYear").addEventListener("click", () => {
+    currentDate.setFullYear(currentDate.getFullYear() + 1);
+    updateCalendar();
+});
+
+document.querySelector("#today").addEventListener("click", () => {
+    currentDate = new Date();
+    updateCalendar();
+});
+
+updateCalendar();
+
+function setClickEvent(items) {
+  items.forEach(item => {
+    item.addEventListener("click", (e) => {
+        const day = parseInt(item.textContent);
+        alert(item.textContent);
+        if (!isNaN(day)) {
+            currentDate.setDate(day);
+            updateCalendar();
+        }
+        item.classList.remove("selected");
+    });
+  });
+}
+setClickEvent(document.querySelectorAll("#calendar tbody tr td div.date-cell"));
+setClickEvent(document.querySelectorAll("#smallCalendar tbody tr td"));
+</script>
+<script src="assets/bind.js"></script>
+<script>
+      // --- usage ---
+    const state = createReactiveState({
+      dataParam: "",
+    })
 </script>
 </body>
 </html>
